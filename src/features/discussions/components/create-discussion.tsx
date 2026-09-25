@@ -1,0 +1,173 @@
+import { useState } from 'react';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { IconPlus } from '@tabler/icons-react';
+import { Controller, useForm } from 'react-hook-form';
+
+import { Button } from '@/components/ui/button';
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer';
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
+import { Textarea } from '@/components/ui/textarea';
+import { toast } from '@/components/ui/toast';
+import { Authorization } from '@/lib/authorization';
+import { ROLES } from '@/lib/roles';
+import {
+  createDiscussionInputSchema,
+  useCreateDiscussion,
+  type CreateDiscussionInput,
+} from '../api/create-discussion';
+
+export const CreateDiscussion = () => {
+  const [open, setOpen] = useState(false);
+
+  const form = useForm<CreateDiscussionInput>({
+    resolver: zodResolver(createDiscussionInputSchema),
+    defaultValues: {
+      title: '',
+      body: '',
+    },
+  });
+
+  const createDiscussionMutation = useCreateDiscussion({
+    mutationConfig: {
+      onSuccess: () => {
+        form.reset();
+        setOpen(false);
+
+        toast.add({
+          type: 'success',
+          description: 'Discussion created successfully.',
+        });
+      },
+      onError: () => {
+        toast.add({
+          type: 'error',
+          description: 'Failed to create discussion. Please try again.',
+        });
+      },
+    },
+  });
+
+  const onSubmit = (values: CreateDiscussionInput) => {
+    createDiscussionMutation.mutate({
+      data: values,
+    });
+  };
+
+  return (
+    <Authorization allowedRoles={[ROLES.ADMIN]}>
+      <Drawer open={open} onOpenChange={setOpen}>
+        <DrawerTrigger
+          render={
+            <Button type="button" size="sm">
+              <IconPlus
+                aria-hidden="true"
+                className="size-4"
+                data-icon="inline-start"
+              />
+              Create Discussion
+            </Button>
+          }
+        />
+
+        <DrawerContent>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <DrawerHeader>
+              <DrawerTitle>Create Discussion</DrawerTitle>
+              <DrawerDescription>
+                Create a new discussion by providing a title and body.
+              </DrawerDescription>
+            </DrawerHeader>
+
+            <div className="p-4">
+              <FieldGroup>
+                <Controller
+                  name="title"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>Title</FieldLabel>
+
+                      <Input
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                      />
+
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+
+                <Controller
+                  name="body"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor={field.name}>Body</FieldLabel>
+
+                      <Textarea
+                        {...field}
+                        id={field.name}
+                        aria-invalid={fieldState.invalid}
+                      />
+
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+              </FieldGroup>
+            </div>
+
+            <DrawerFooter>
+              <Button
+                type="submit"
+                disabled={createDiscussionMutation.isPending}
+              >
+                {createDiscussionMutation.isPending && (
+                  <Spinner data-icon="inline-start" />
+                )}
+
+                {createDiscussionMutation.isPending
+                  ? 'Submitting...'
+                  : 'Submit'}
+              </Button>
+
+              <DrawerClose
+                render={
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={createDiscussionMutation.isPending}
+                  >
+                    Cancel
+                  </Button>
+                }
+              />
+            </DrawerFooter>
+          </form>
+        </DrawerContent>
+      </Drawer>
+    </Authorization>
+  );
+};
