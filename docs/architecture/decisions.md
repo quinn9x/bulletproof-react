@@ -278,3 +278,21 @@ Every completed task should update `progress.md`.
 ### Goal
 
 A new AI session should be able to resume development without depending on the previous conversation history.
+
+### ADR-013 — Enable TypeScript Strict Mode
+
+**Date:** `2026-09-28`
+
+**Decision:** Enable TypeScript `strict` mode in both `tsconfig.app.json` and `tsconfig.node.json`.
+
+**Reason:**
+
+The project already passes TypeScript verification with the stricter typechecking rules enabled. This establishes a stronger type-safety baseline without requiring a broad refactor.
+
+**Verification:**
+
+- `pnpm exec tsc -b` passes.
+- `pnpm exec vp check` reports 0 errors.
+- `pnpm exec vp test` passes: 3 test files, 13 tests.
+- `pnpm exec vp build` succeeds.
+- Existing lint warnings remain tracked under `FND-03`.

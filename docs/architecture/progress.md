@@ -8,8 +8,8 @@
 - Repository: `quinn9x/bulletproof-react`
 - Baseline commit: `f083e74ff4c8290587e4808cd07d2fef701e519f`
 - Current phase: Phase 1 — Quality Foundation
-- Current task: `FND-01.5`
-- Status: `TODO`
+- Current task: `FND-03`
+- Status: `IN_PROGRESS`
 
 ## Current Objective
 
@@ -62,24 +62,36 @@ The project must remain easy to resume across AI sessions without depending on p
 - [x] Confirmed the Dev Container provides `C.UTF-8`
 - [x] Confirmed `vp test` runs successfully without an explicit `LANG` override
 
+### FND-02 — TypeScript / Type Safety Baseline
+
+- [x] Reviewed TypeScript configuration
+- [x] Enabled `strict` mode for application code
+- [x] Enabled `strict` mode for Node/Vite configuration
+- [x] Verified TypeScript compilation with `tsc -b`
+- [x] Audited explicit `any` usage
+- [x] Confirmed existing generic `any` usage does not currently prevent strict typechecking
+- [x] `vp check` passes with 0 errors
+- [x] `vp test` passes: 3 test files, 13 tests
+- [x] Production build succeeds
+
 ## In Progress
 
-### FND-01.3 — Test Architecture
+### FND-03 — Formatting and Linting Consistency
 
 #### Goal
 
-Define a practical test architecture based on the application's actual behavior and critical user flows before adding a large number of tests.
+Establish consistent automated code quality rules without unnecessary churn.
 
 #### Tasks
 
-- [x] Audit existing feature and API boundaries
-- [x] Identify critical application behaviors
-- [x] Identify appropriate unit-test targets
-- [x] Review existing MSW infrastructure for reuse in tests
-- [x] Define initial test matrix
-- [x] Implement the first high-value tests
-- [x] Verify the test architecture with `vp test`
-- [x] Update project checkpoint
+- [ ] Review current Vite+ formatting configuration
+- [ ] Review current lint configuration
+- [ ] Resolve meaningful warnings
+- [ ] Distinguish genuine application issues from generated/UI-library code
+- [ ] Avoid broad refactoring solely for stylistic reasons
+- [ ] Verify `vp check`
+- [ ] Verify tests and production build
+- [ ] Update project checkpoint
 
 #### Definition of Done
 
@@ -94,11 +106,11 @@ Define a practical test architecture based on the application's actual behavior 
 
 ## Next Tasks
 
-1. `FND-01.5` — Tooling and Dependency Cleanup
-2. `FND-02` — TypeScript / Type Safety Baseline
-3. `FND-03` — Architecture Boundary Enforcement
-4. `FND-04` — Authentication and Authorization Review
-5. `FND-05` — E2E Smoke Test
+1. `FND-03` — Formatting and Linting Consistency
+2. `FND-04` — Test and Build Verification
+3. `FND-05` — E2E Smoke Test
+4. `ARC-01` — Application Boundary Review
+5. `ARC-02` — Feature Module Consistency
 
 ## Current Blockers
 
@@ -179,9 +191,9 @@ Never blindly trust a stale checkpoint.
 
 ## Last Updated
 
-- Date: `2026-09-27`
-- Last verified commit: `f083e74ff4c8290587e4808cd07d2fef701e519f`
-- Updated by: AI-assisted architecture review
+- Date: `2026-09-28`
+- Last verified commit: `b904dab137f093fd3b35b5978c272ede45f281cc`
+- Updated by: AI-assisted development
 
 ## AI Maintenance Rules
 

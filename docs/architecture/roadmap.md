@@ -19,7 +19,7 @@
 
 ### BASE-01 — Establish Project Checkpoint
 
-**Status:** `IN_PROGRESS`
+**Status:** `DONE`
 
 **Goal:** Establish persistent project state so development can continue across AI sessions.
 
@@ -31,30 +31,24 @@
 
 #### Current State
 
-- Architecture state files have been created.
+- Persistent architecture state files have been created.
 - Repository structure has been inspected.
 - Baseline tooling has been verified.
-- `vp check` passes formatting and reports no errors.
-- `vp test` successfully runs the initial unit test.
-- `pnpm` installation succeeds.
+- `vp check` passes with 0 errors.
+- `vp test` passes successfully.
+- TypeScript verification passes.
 - Production build succeeds.
-- The repository currently has lint warnings but no lint errors.
-- There are currently no CI workflow files under `.github/workflows`.
-
-#### Remaining Work
-
-- [ ] Finalize the persistent checkpoint files.
-- [ ] Verify the checkpoint files against the actual repository state.
-- [ ] Decide how repository-local tooling changes should be committed.
-- [ ] Commit the baseline checkpoint.
+- CI workflow exists under `.github/workflows/ci.yml`.
+- Current lint baseline contains 6 warnings and 0 errors.
+- Project progress, roadmap, and architecture decisions are maintained as persistent checkpoints.
 
 #### Definition of Done
 
-- [ ] `progress.md`, `roadmap.md`, and `decisions.md` describe the same project state.
-- [ ] Current task and next task are explicitly identified.
-- [ ] Repository verification results are recorded.
-- [ ] No stale completion claims remain.
-- [ ] Checkpoint changes are committed.
+- [x] `progress.md`, `roadmap.md`, and `decisions.md` describe the same project state.
+- [x] Current task and next task are explicitly identified.
+- [x] Repository verification results are recorded.
+- [x] No stale completion claims remain.
+- [x] Checkpoint changes are committed.
 
 ## Phase 1 — Foundation
 
@@ -93,7 +87,7 @@
 
 ### FND-02 — TypeScript / Type Safety Baseline
 
-**Status:** `TODO`
+**Status:** `DONE`
 
 **Goal:** Establish and document the project's type-safety baseline.
 
@@ -106,16 +100,31 @@
 - Review environment variable typing.
 - Review boundaries between application code and external data.
 
+#### Current State
+
+- TypeScript `strict` mode is enabled for application code.
+- TypeScript `strict` mode is enabled for Node/Vite configuration.
+- `tsc -b` passes with no errors.
+- Existing explicit `any` usage was reviewed.
+- No broad `any` refactor was introduced because strict typechecking does not currently require it.
+- `vp check` passes with 0 errors.
+- `vp test` passes with 13 tests.
+- Production build succeeds.
+
 #### Definition of Done
 
-- TypeScript configuration is intentionally documented.
-- Important unsafe boundaries are identified.
-- Critical unsafe types are removed or explicitly justified.
-- Typecheck is part of the standard verification process.
+- [x] TypeScript configuration is intentionally documented.
+- [x] Strict typechecking is enabled for application and Node configuration.
+- [x] Important unsafe boundaries were reviewed.
+- [x] Critical unsafe types are removed or explicitly justified.
+- [x] Typecheck is part of the standard verification process.
+- [x] `vp check` passes with no errors.
+- [x] Tests pass.
+- [x] Production build succeeds.
 
 ### FND-03 — Formatting and Linting Consistency
 
-**Status:** `TODO`
+**Status:** `IN_PROGRESS`
 
 **Goal:** Establish consistent automated code quality rules without unnecessary churn.
 
@@ -143,7 +152,7 @@
 
 ### FND-04 — Test and Build Verification
 
-**Status:** `IN_PROGRESS`
+**Status:** `TODO`
 
 **Goal:** Establish a reliable automated test and build baseline.
 
