@@ -4,8 +4,7 @@ import { z } from 'zod';
 import { apiClient } from '@/lib/api-client';
 import { type MutationConfig } from '@/lib/react-query';
 import { type Comment } from '@/types/api';
-
-import { getInfiniteCommentsQueryOptions } from './get-comments';
+import { commentsQueryKeys } from './get-comments';
 
 export const createCommentInputSchema = z.object({
   discussionId: z.string().min(1, 'Discussion ID is required'),
@@ -36,9 +35,9 @@ export const useCreateComment = ({
   const { onSuccess, ...restConfig } = mutationConfig || {};
 
   return useMutation({
-    onSuccess: (...args) => {
-      void queryClient.invalidateQueries({
-        queryKey: getInfiniteCommentsQueryOptions(discussionId).queryKey,
+    onSuccess: async (...args) => {
+      await queryClient.invalidateQueries({
+        queryKey: commentsQueryKeys.list(discussionId),
       });
       onSuccess?.(...args);
     },

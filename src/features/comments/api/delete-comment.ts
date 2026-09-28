@@ -2,8 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { apiClient } from '@/lib/api-client';
 import { type MutationConfig } from '@/lib/react-query';
-
-import { getInfiniteCommentsQueryOptions } from './get-comments';
+import { commentsQueryKeys } from './get-comments';
 
 export const deleteComment = ({ commentId }: { commentId: string }) => {
   return apiClient.delete(`/comments/${commentId}`);
@@ -25,7 +24,7 @@ export const useDeleteComment = ({
   return useMutation({
     onSuccess: async (...args) => {
       await queryClient.invalidateQueries({
-        queryKey: getInfiniteCommentsQueryOptions(discussionId).queryKey,
+        queryKey: commentsQueryKeys.list(discussionId),
       });
 
       onSuccess?.(...args);

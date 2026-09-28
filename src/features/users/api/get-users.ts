@@ -8,9 +8,13 @@ export const getUsers = (): Promise<User[]> => {
   return apiClient.get<User[]>('/users');
 };
 
+export const usersQueryKeys = {
+  all: ['users'] as const,
+};
+
 export const getUsersQueryOptions = () => {
   return queryOptions({
-    queryKey: ['users'],
+    queryKey: usersQueryKeys.all,
     queryFn: () => getUsers(),
   });
 };

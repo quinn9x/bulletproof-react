@@ -20,6 +20,7 @@ export const getDiscussions = (
 export const discussionsQueryKeys = {
   all: ['discussions'] as const,
   list: (page = 1) => ['discussions', { page }] as const,
+  detail: (discussionId: string) => ['discussions', discussionId] as const,
 };
 
 export const getDiscussionsQueryOptions = ({

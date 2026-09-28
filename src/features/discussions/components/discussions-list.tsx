@@ -6,6 +6,7 @@ import {
   SimpleTable,
   type SimpleTableColumn,
 } from '@/components/common/simple-table';
+import { Button } from '@/components/ui/button';
 import { Link } from '@/components/ui/link';
 import { Spinner } from '@/components/ui/spinner';
 import { paths } from '@/config/paths';
@@ -13,7 +14,6 @@ import type { Discussion } from '@/types/api';
 import { formatDate } from '@/utils/format';
 import { getDiscussionQueryOptions } from '../api/get-discussion';
 import { useDiscussions } from '../api/get-discussions';
-
 import { DeleteDiscussion } from './delete-discussion';
 
 export type DiscussionsListProps = {
@@ -34,8 +34,26 @@ export const DiscussionsList = ({
 
   if (discussionsQuery.isLoading) {
     return (
-      <div className="flex h-48 w-full items-center justify-center">
+      <div
+        className="flex h-48 w-full items-center justify-center"
+        aria-label="Loading discussions"
+      >
         <Spinner className="size-10" />
+      </div>
+    );
+  }
+
+  if (discussionsQuery.isError) {
+    return (
+      <div
+        role="alert"
+        className="flex h-40 flex-col items-center justify-center gap-2 text-gray-500"
+      >
+        <p>Failed to load discussions.</p>
+
+        <Button variant="outline" onClick={() => discussionsQuery.refetch()}>
+          Try Again
+        </Button>
       </div>
     );
   }

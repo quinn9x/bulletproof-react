@@ -26,10 +26,14 @@ export const getComments = ({
   });
 };
 
+export const commentsQueryKeys = {
+  all: ['comments'] as const,
+  list: (discussionId: string) => ['comments', discussionId] as const,
+};
+
 export const getInfiniteCommentsQueryOptions = (discussionId: string) => {
   return infiniteQueryOptions({
-    queryKey: ['comments', discussionId],
-
+    queryKey: commentsQueryKeys.list(discussionId),
     queryFn: ({ pageParam }) =>
       getComments({
         discussionId,

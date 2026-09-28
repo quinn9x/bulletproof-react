@@ -546,9 +546,9 @@ ARC-05 is complete based on repository inspection.
 
 ### REL-02 — Loading and Empty States
 
-**Status:** `IN_PROGRESS`
+**Status:** `DONE`
 
-Review all important asynchronous flows for:
+Reviewed important asynchronous flows for:
 
 - Loading states.
 - Empty states.
@@ -557,18 +557,54 @@ Review all important asynchronous flows for:
 - Race conditions.
 - Stale data.
 
+### Implementation
+
+- [x] Discussions list has a loading state.
+- [x] Discussions list has an error state with manual retry.
+- [x] Discussions list preserves the existing empty state behavior through `SimpleTable`.
+- [x] Users list has a loading state.
+- [x] Users list has an error state with manual retry.
+- [x] Users list preserves the existing empty state behavior through `SimpleTable`.
+- [x] Comments list has a loading state.
+- [x] Comments list has an error state with manual retry.
+- [x] Comments list has an explicit empty state.
+- [x] Comments pagination has a loading state and disables the load-more action while fetching.
+- [x] Comment creation disables form actions while the mutation is pending.
+- [x] Comment deletion disables dialog actions while the mutation is pending.
+- [x] Discussion detail loading and error states were reviewed.
+- [x] Global Suspense and authentication loading fallbacks were reviewed.
+- [x] Global React Query query and mutation error handling was reviewed.
+- [x] Error boundary fallback was reviewed.
+- [x] Existing query configuration was reviewed.
+
+### Verification
+
+- [x] `vp test` passes: 5 test files, 25 tests.
+- [x] `vp check` reports 0 errors.
+- [x] Existing lint warnings are limited to shared accessibility components and remain non-blocking.
+- [x] `git diff --check` passes.
+
+### Follow-up
+
+Data consistency concerns such as cache invalidation consistency, stale data, concurrent mutations, and mutation lifecycle behavior are deferred to `REL-03`.
+
 ### REL-03 — Data Consistency
 
-**Status:** `TODO`
+**Status:** `DONE`
 
-Review React Query behavior for:
-
-- Query keys.
-- Cache invalidation.
-- Optimistic updates.
-- Mutation lifecycle.
-- Stale data.
-- Concurrent mutations.
+- [x] Reviewed React Query query-key structure.
+- [x] Centralized discussion, comment, and user query keys where shared cache coordination is required.
+- [x] Reviewed mutation cache invalidation.
+- [x] Verified comment create/delete invalidation for discussion-specific infinite queries.
+- [x] Verified discussion create/update/delete invalidation behavior.
+- [x] Verified user deletion invalidation behavior.
+- [x] Reviewed profile mutation lifecycle and authenticated-user refetch behavior.
+- [x] Reviewed optimistic update usage; no optimistic cache updates are currently required.
+- [x] Reviewed stale-data configuration.
+- [x] Reviewed concurrent mutation behavior.
+- [x] `vp check`: 0 errors, 3 existing accessibility warnings.
+- [x] `vp test`: 5 Vitest files, 25 tests passed.
+- [x] `git diff --check`: passes.
 
 ## Phase 4 — Accessibility and UX
 

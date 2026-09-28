@@ -2,10 +2,10 @@ import {
   SimpleTable,
   type SimpleTableColumn,
 } from '@/components/common/simple-table';
+import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import type { User } from '@/types/api';
 import { formatDate } from '@/utils/format';
-
 import { useUsers } from '../api/get-users';
 import { DeleteUser } from './delete-user';
 
@@ -22,8 +22,14 @@ export const UsersList = () => {
 
   if (usersQuery.isError) {
     return (
-      <div className="flex h-48 items-center justify-center text-sm text-destructive">
-        Failed to load users.
+      <div
+        role="alert"
+        className="flex h-40 flex-col items-center justify-center gap-2 text-sm text-destructive"
+      >
+        <p>Failed to load users.</p>
+        <Button variant="outline" onClick={() => usersQuery.refetch()}>
+          Try Again
+        </Button>
       </div>
     );
   }
