@@ -1,9 +1,17 @@
-import { Outlet } from 'react-router';
+import { Outlet, useRouteError } from 'react-router';
 
+import { MainErrorFallback } from '@/components/errors/main';
 import { DashboardLayout } from '@/components/layouts';
 
 export const ErrorBoundary = () => {
-  return <div>Something went wrong!</div>;
+  const error = useRouteError();
+
+  return (
+    <MainErrorFallback
+      error={error}
+      resetErrorBoundary={() => window.location.reload()}
+    />
+  );
 };
 
 const AppRoot = () => {

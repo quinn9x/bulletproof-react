@@ -13,10 +13,9 @@ export const getApiErrorMessage = (
     return fallback;
   }
 
-  return (
-    error.response?.data?.message ??
-    error.response?.data?.error ??
-    error.message ??
-    fallback
-  );
+  if (!error.response) {
+    return 'Unable to connect to the server. Please check your connection and try again.';
+  }
+
+  return error.response.data?.message ?? error.response.data?.error ?? fallback;
 };

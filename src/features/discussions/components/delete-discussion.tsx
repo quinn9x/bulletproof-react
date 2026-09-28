@@ -12,7 +12,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { toast } from '@/components/ui/toast';
-import { getApiErrorMessage } from '@/lib/api-error';
 import { useDeleteDiscussion } from '../api/delete-discussion';
 
 type DeleteDiscussionProps = {
@@ -26,16 +25,6 @@ export const DeleteDiscussion = ({ id }: DeleteDiscussionProps) => {
         toast.add({
           type: 'success',
           description: 'Discussion Deleted',
-        });
-      },
-
-      onError: (error) => {
-        toast.add({
-          type: 'error',
-          description: getApiErrorMessage(
-            error,
-            'Failed to delete discussion. Please try again.',
-          ),
         });
       },
     },

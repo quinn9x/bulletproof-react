@@ -55,12 +55,6 @@ export const CreateDiscussion = () => {
           description: 'Discussion created successfully.',
         });
       },
-      onError: () => {
-        toast.add({
-          type: 'error',
-          description: 'Failed to create discussion. Please try again.',
-        });
-      },
     },
   });
 

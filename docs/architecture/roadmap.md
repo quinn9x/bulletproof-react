@@ -474,41 +474,79 @@ grep -RInE \\
   2>/dev/null
 ```
 
-### ARC-05 — Authentication and Authorization Review
+## ARC-05 — Authentication and Authorization Review
 
-**Status:** `DONE`
+### Current State
 
-Perform a dedicated security-oriented review of:
+- [x] Reviewed authentication state management through `react-query-auth`.
+- [x] Confirmed authentication state is initialized through `AuthLoader` and `/auth/me`.
+- [x] Reviewed protected route handling through `ProtectedRoute`.
+- [x] Confirmed unauthenticated users are redirected to the login route.
+- [x] Reviewed role definitions and authorization checks.
+- [x] Confirmed role-based UI authorization is centralized through `Authorization` and `useAuthorization`.
+- [x] Reviewed resource-level authorization policy for comment deletion.
+- [x] Confirmed authentication uses cookie-based credentials with Axios `withCredentials`.
+- [x] Confirmed no application code stores authentication tokens in `localStorage` or `sessionStorage`.
+- [x] Confirmed `401` responses are handled centrally by the API client.
+- [x] Reviewed logout behavior through `/auth/logout`.
+- [x] Reviewed authentication integration coverage for login, current-user lookup, invalid credentials, and logout.
+- [x] No authentication or authorization refactor was required.
 
-- Session handling.
-- Authentication state.
-- Protected routes.
-- Role handling.
-- Authorization checks.
-- Token/cookie behavior.
-- Logout behavior.
-- Persistence behavior.
+### Review Result
 
-Do not assume client-side authorization is sufficient for a real backend.
+The current authentication and authorization implementation is consistent with the intended client-side architecture.
+
+- Authentication state is managed centrally through `react-query-auth`.
+- `AuthLoader` resolves the current authenticated user before rendering the application.
+- `ProtectedRoute` prevents unauthenticated users from accessing protected application routes.
+- Authentication credentials are handled through cookies rather than application-managed browser storage.
+- Axios is configured with `withCredentials: true`, allowing the browser to send authentication cookies with API requests.
+- Unauthorized API responses (`401`) are handled centrally by redirecting the user to the login route.
+- Logout is implemented through the backend `/auth/logout` endpoint.
+- Roles are explicitly typed as `ADMIN` and `USER`.
+- Role-based UI access is centralized through `Authorization` and `useAuthorization`.
+- Resource-level authorization for comment deletion checks both the user's role and resource ownership.
+
+A security boundary observation remains: client-side route protection and authorization checks must not be treated as enforcement of backend authorization. The backend must independently validate authentication, roles, resource ownership, and permissions for protected operations.
+
+Cookie security attributes such as `HttpOnly`, `Secure`, `SameSite`, expiration, and server-side session/token invalidation cannot be established from the frontend implementation alone. The repository's mock authentication implementation documents `Secure` and `HttpOnly` as requirements for a real API, but these attributes should be verified against the actual backend before production deployment.
+
+ARC-05 is complete based on repository inspection.
 
 ## Phase 3 — Reliability
 
 ### REL-01 — Error Handling
 
-**Status:** `IN_PROGRESS`
+**Status:** `DONE`
 
-Review:
+#### Current State
 
-- Global error handling.
-- Route errors.
-- API errors.
-- Mutation failures.
-- Network failures.
-- User-facing error messages.
+- Global mutation errors are handled through React Query `MutationCache`.
+- Feature-level duplicate mutation error toasts were removed.
+- Feature-level success toasts remain unchanged.
+- API errors are normalized through `getApiErrorMessage`.
+- Network failures receive a user-facing fallback message.
+- The application route error boundary uses the shared error fallback.
+- Error fallback supports error-boundary reset behavior.
+- API error handling has dedicated tests.
+- `vp test`, `vp check`, and `vp build` pass.
+
+#### Definition of Done
+
+- [x] Global error handling reviewed.
+- [x] Route errors handled consistently.
+- [x] API errors normalized.
+- [x] Mutation failures handled globally.
+- [x] Network failures provide a user-facing message.
+- [x] Duplicate mutation error notifications removed.
+- [x] Error handling behavior is tested.
+- [x] Tests pass.
+- [x] Typecheck/lint/format verification passes.
+- [x] Production build succeeds.
 
 ### REL-02 — Loading and Empty States
 
-**Status:** `TODO`
+**Status:** `IN_PROGRESS`
 
 Review all important asynchronous flows for:
 
@@ -732,5 +770,5 @@ The repository is the source of truth when this roadmap becomes stale.
   - `vp check`: 0 errors, 6 warnings.
   - `vp test`: 4 Vitest files, 19 tests, plus 1 passing Playwright smoke test.
   - `vp build`: succeeds.
-- Current task: `REL-01`
+- Current task: `REL-02`
 - Status: `IN_PROGRESS`

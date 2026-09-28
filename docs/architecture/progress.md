@@ -8,7 +8,7 @@
 - Repository: `quinn9x/bulletproof-react`
 - Baseline commit: `fd8e1788e83d1e55cb410a1b3cbc30aa9e760e4d`
 - Current phase: Phase 1 — Quality Foundation
-- Current task: `REL-01`
+- Current task: `REL-02`
 - Status: `IN_PROGRESS`
 
 ## Current Objective
@@ -383,6 +383,37 @@ Cookie security attributes such as `HttpOnly`, `Secure`, `SameSite`, expiration,
 
 ARC-05 is complete based on repository inspection.
 
+## REL-01 — Error Handling
+
+### Current State
+
+- [x] Reviewed global error handling.
+- [x] Reviewed route-level error handling.
+- [x] Reviewed API error handling.
+- [x] Added centralized API error message extraction.
+- [x] Added user-friendly network error handling.
+- [x] Centralized mutation error notifications through React Query `MutationCache`.
+- [x] Removed duplicate mutation error toasts from feature components.
+- [x] Preserved feature-level success toasts.
+- [x] Connected the application route error boundary to the shared error fallback.
+- [x] Shared error fallback supports `react-error-boundary` reset behavior.
+- [x] Added tests for API error message handling.
+- [x] `vp test` passes.
+- [x] `vp check` passes.
+- [x] `vp build` passes.
+
+### Result
+
+REL-01 is complete.
+
+Error handling now has a consistent path for API errors, network failures, mutation failures, and route-level errors while preserving feature-specific success notifications.
+
+### Verification
+
+- `vp test`: PASS
+- `vp check`: PASS
+- `vp build`: PASS
+
 ### Verification
 
 The authentication and authorization review covered:
@@ -526,9 +557,8 @@ None.
 
 ## Next Tasks
 
-1. `REL-01` — Error Handling
-2. `REL-02` — Loading and Empty States
-3. `REL-03` — Data Consistency
+1. `REL-02` — Loading and Empty States
+2. `REL-03` — Data Consistency
 
 ## Repository Verification
 

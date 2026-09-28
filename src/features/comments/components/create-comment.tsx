@@ -24,7 +24,6 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/toast';
-import { getApiErrorMessage } from '@/lib/api-error';
 import {
   createCommentInputSchema,
   useCreateComment,
@@ -56,16 +55,6 @@ export const CreateComment = ({ discussionId }: CreateCommentProps) => {
         toast.add({
           type: 'success',
           description: 'Comment created successfully.',
-        });
-      },
-
-      onError: (error) => {
-        toast.add({
-          type: 'error',
-          description: getApiErrorMessage(
-            error,
-            'Failed to create comment. Please try again.',
-          ),
         });
       },
     },

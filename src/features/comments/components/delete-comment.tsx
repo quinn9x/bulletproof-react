@@ -12,7 +12,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { toast } from '@/components/ui/toast';
-import { getApiErrorMessage } from '@/lib/api-error';
 import { useDeleteComment } from '../api/delete-comment';
 
 type DeleteCommentProps = {
@@ -28,16 +27,6 @@ export const DeleteComment = ({ id, discussionId }: DeleteCommentProps) => {
         toast.add({
           type: 'success',
           description: 'Comment Deleted',
-        });
-      },
-
-      onError: (error) => {
-        toast.add({
-          type: 'error',
-          description: getApiErrorMessage(
-            error,
-            'Failed to delete comment. Please try again.',
-          ),
         });
       },
     },

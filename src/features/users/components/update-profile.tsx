@@ -26,7 +26,6 @@ import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/toast';
-import { getApiErrorMessage } from '@/lib/api-error';
 import { useUser } from '@/lib/auth';
 import {
   updateProfileInputSchema,
@@ -56,16 +55,6 @@ export const UpdateProfile = () => {
         toast.add({
           type: 'success',
           description: 'User Profile Updated',
-        });
-      },
-
-      onError: (error) => {
-        toast.add({
-          type: 'error',
-          description: getApiErrorMessage(
-            error,
-            'Failed to update profile. Please try again.',
-          ),
         });
       },
     },
