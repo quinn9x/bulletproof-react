@@ -1,6 +1,9 @@
 {
   "name": "Bulletproof React",
   "image": "ghcr.io/voidzero-dev/vite-plus:1.0.0-rc.1",
+  "features": {
+    "ghcr.io/postfinance/devcontainer-features/playwright-deps:2": {}
+  },
   "containerEnv": {
     "LANG": "C.UTF-8",
     "LC_ALL": "C.UTF-8"

@@ -108,7 +108,7 @@
 - Existing explicit `any` usage was reviewed.
 - No broad `any` refactor was introduced because strict typechecking does not currently require it.
 - `vp check` passes with 0 errors.
-- `vp test` passes with 13 tests.
+- `vp test` passes with 19 tests.
 - Production build succeeds.
 
 #### Definition of Done
@@ -124,7 +124,7 @@
 
 ### FND-03 — Formatting and Linting Consistency
 
-**Status:** `IN_PROGRESS`
+**Status:** `DONE`
 
 **Goal:** Establish consistent automated code quality rules without unnecessary churn.
 
@@ -138,10 +138,15 @@
 
 #### Current Known Warnings
 
-- `react/only-export-components` in route files using `clientLoader`.
-- `jsx-a11y/prefer-tag-over-role` in `spinner.tsx`.
-- `jsx-a11y/prefer-tag-over-role` in `field.tsx`.
-- `jsx-a11y/label-has-associated-control` in `label.tsx`.
+- `react/only-export-components` in:
+  - `src/app/routes/app/discussions/discussion.tsx`
+  - `src/app/routes/app/discussions/index.tsx`
+  - `src/app/routes/app/users.tsx`
+- `jsx-a11y/prefer-tag-over-role` in:
+  - `src/components/ui/spinner.tsx`
+  - `src/components/ui/field.tsx`
+- `jsx-a11y/label-has-associated-control` in:
+  - `src/components/ui/label.tsx`
 
 #### Definition of Done
 
@@ -152,7 +157,7 @@
 
 ### FND-04 — Test and Build Verification
 
-**Status:** `TODO`
+**Status:** `DONE`
 
 **Goal:** Establish a reliable automated test and build baseline.
 
@@ -162,48 +167,90 @@
 - Test import convention is `import { describe, expect, it } from 'vite-plus/test';`.
 - `src/utils/format.test.ts` exists.
 - `formatDate` currently has two passing tests.
-- `vp test` passes in the current dev container.
-- TypeScript verification and production build have completed successfully.
+- Authentication schema unit tests exist.
+- Authentication API integration tests exist.
+- Discussions API integration tests exist.
+- MSW-backed integration test setup exists.
+- An in-memory test database seed exists.
+- Discussion create, read, update, and delete behavior is covered.
+- `@vitest/coverage-v8` is included in development dependencies.
+- `pnpm-lock.yaml` has been updated.
+- `vp test` passes: 4 test files, 19 tests.
+- `vp check` passes with 0 errors and 6 warnings.
+- Production build succeeds.
 - The dev container initially had a broken locale configuration that caused `vp test` to panic.
-- The issue was traced to `LANG=en_US.UTF-8` while only `C`, `C.utf8`, and `POSIX` locales are installed.
-- `LANG=C.UTF-8 vp test` succeeds.
-- The current dev container now runs `vp test` successfully without the locale override.
-
-#### Next Work
-
-- [ ] Expand tests around important pure utilities.
-- [ ] Identify critical application flows requiring tests.
-- [ ] Add tests for important API/query behavior where practical.
-- [ ] Add browser/E2E coverage only after the unit/integration baseline is stable.
-- [ ] Document the required test environment.
+- The issue was traced to `LANG=en_US.UTF-8` while only `C`, `C.utf8`, and `POSIX` locales were installed.
+- The current dev container runs `vp test` successfully without an explicit `LANG` override.
 
 #### Definition of Done
 
-- Test command runs reliably in the supported development environment.
-- Critical utility behavior has unit coverage.
-- Critical application behavior has an identified testing strategy.
-- Production build remains verified.
+- [x] Test command runs reliably in the supported development environment.
+- [x] Critical utility behavior has unit coverage.
+- [x] Critical API behavior has integration coverage.
+- [x] Production build remains verified.
+- [x] Test environment requirements are documented.
 
 ### FND-05 — E2E Smoke Test
 
-**Status:** `TODO`
+**Status:** `DONE`
 
-**Goal:** Verify that the application can start and that critical user flows work end-to-end.
+**Goal:** Verify that the application can start and that a critical authentication flow works at browser level.
 
-#### Initial Smoke Flow
+#### Current State
 
-- Application starts.
-- Landing page renders.
-- Login page renders.
-- Authentication flow can be exercised against the mock backend.
-- Protected application routes can be reached after authentication.
-- A representative CRUD flow works.
+- Playwright is installed through `@playwright/test`.
+- `e2e/smoke.spec.ts` exists.
+- Playwright runs successfully through `pnpm exec playwright test`.
+- The application login route is `/auth/login`, not `/login`.
+- The login smoke test:
+  - opens `/auth/login`;
+  - finds the `Log in to your account` heading;
+  - fills `Email Address` with `john@example.com`;
+  - fills `Password` with `password`;
+  - clicks `Log in`;
+  - verifies that authentication redirects to `/app`;
+  - navigates to `/app/discussions`;
+  - verifies that the authenticated user can access the discussions route.
+- The E2E runtime uses the application's existing MSW/mock authentication environment.
+- Playwright-generated `playwright-report/` and `test-results/` directories are ignored by `.gitignore`.
+- CI installs Chromium and its required system dependencies with `pnpm exec playwright install --with-deps chromium`.
+- CI runs the Playwright E2E suite with `pnpm exec playwright test`.
+- Testing documentation references the current E2E test location and execution command.
+
+#### Current Verification
+
+- [x] Browser test runner is configured.
+- [x] Critical authentication happy path is automated.
+- [x] Authenticated access to the discussions route is automated.
+- [x] E2E test runs successfully in the current development container.
+- [x] Unit and integration tests continue to pass.
+- [x] `vp check` passes with 0 errors.
+- [x] Production build succeeds.
+- [x] Playwright browser installation is configured for CI.
+- [x] CI includes a dedicated Playwright E2E step.
+- [x] E2E setup and execution are documented.
+
+#### Known E2E Details
+
+- Application URL during local E2E execution: `http://127.0.0.1:5173`.
+- Login route: `/auth/login`.
+- Successful login destination: `/app`.
+- Discussions route: `/app/discussions`.
+- Test credentials currently used by the mock environment:
+  - Email: `john@example.com`
+  - Password: `password`
 
 #### Definition of Done
 
-- E2E tooling is selected and documented.
-- At least one critical happy-path flow is automated.
-- Test can run consistently in the development/CI environment.
+- [x] Playwright is configured and runs successfully.
+- [x] A critical authentication flow is covered at browser level.
+- [x] Authenticated access to discussions is covered.
+- [x] Unit and integration tests remain passing.
+- [x] Formatting, linting, and typechecking remain passing with no errors.
+- [x] Production build remains passing.
+- [x] CI installs the required Playwright browser dependencies.
+- [x] CI runs the E2E suite.
+- [x] E2E setup and execution are documented.
 
 ## Phase 2 — Architecture
 
@@ -369,7 +416,8 @@ Investigate the current production bundle.
 Current observation:
 
 - Production build reports chunks larger than 500 kB after minification.
-- `bootstrap` is currently the largest reported chunk.
+- `bootstrap` is currently the largest reported chunk at approximately 816 kB.
+- `index` is approximately 352 kB.
 - Several application/vendor chunks are also relatively large.
 
 Do not optimize based only on bundle-size warnings. First identify actual dependency and loading boundaries.
@@ -424,6 +472,7 @@ Document:
 - Mock backend.
 - Architecture.
 - Contribution workflow.
+- E2E smoke tests.
 
 ### DX-03 — Dependency Maintenance
 
@@ -517,3 +566,13 @@ When project priorities change:
 - Keep the next actionable task explicit.
 
 The repository is the source of truth when this roadmap becomes stale.
+
+## Last Updated
+
+- Date: `2026-09-28`
+- Last verified state:
+  - `vp check`: 0 errors, 6 warnings.
+  - `vp test`: 4 Vitest files, 19 tests, plus 1 passing Playwright smoke test.
+  - `vp build`: succeeds.
+- Current task: `FND-05`
+- Status: `IN_PROGRESS`

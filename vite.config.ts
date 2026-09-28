@@ -9,7 +9,11 @@ export default defineConfig({
     port: 5173,
   },
   fmt: {
-    ignorePatterns: ['public/mockServiceWorker.js'],
+    ignorePatterns: [
+      'public/mockServiceWorker.js',
+      'playwright-report/**/*',
+      'test-results/**/*',
+    ],
 
     singleQuote: true,
     printWidth: 80,
@@ -21,6 +25,8 @@ export default defineConfig({
       'node_modules/*',
       'public/mockServiceWorker.js',
       'generators/*',
+      'playwright-report/**/*',
+      'test-results/**/*',
     ],
 
     env: {
@@ -94,5 +100,6 @@ export default defineConfig({
   },
   test: {
     setupFiles: ['./src/testing/setup.ts'],
+    exclude: ['e2e/**/*', 'node_modules/**/*'],
   },
 });

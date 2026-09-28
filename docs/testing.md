@@ -20,7 +20,47 @@ Integration testing checks how different parts of your application work together
 
 End-to-End Testing is a method that evaluates an application as a whole. These tests involve automating the complete application, including both the frontend and backend, to confirm that the entire system functions correctly. End-to-End tests simulate how a user would interact with the application.
 
-[E2E Example Code](../e2e/tests/smoke.spec.ts)
+[E2E Example Code](../e2e/smoke.spec.ts)
+
+The project uses Playwright for browser-level E2E testing.
+
+Run the E2E tests with:
+
+```bash
+pnpm exec playwright test
+```
+
+Playwright automatically starts the Vite development server for E2E tests at:
+
+```text
+http://127.0.0.1:5173
+```
+
+The E2E environment uses the application's MSW API mocking:
+
+```text
+VITE_APP_API_URL=http://localhost:8080
+VITE_APP_ENABLE_API_MOCKING=true
+```
+
+The current smoke test verifies the authentication flow:
+
+1. Open `/auth/login`.
+2. Enter the mock user credentials.
+3. Submit the login form.
+4. Verify that authentication redirects to `/app`.
+
+In CI, Playwright installs the Chromium browser and its required system dependencies with:
+
+```bash
+pnpm exec playwright install --with-deps chromium
+```
+
+The CI workflow then runs the E2E test suite with:
+
+```bash
+pnpm exec playwright test
+```
 
 ## Recommended Tooling:
 
