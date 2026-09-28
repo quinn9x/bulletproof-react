@@ -9,6 +9,8 @@ export default defineConfig({
     port: 5173,
   },
   fmt: {
+    ignorePatterns: ['public/mockServiceWorker.js'],
+
     singleQuote: true,
     printWidth: 80,
     tabWidth: 2,
@@ -86,8 +88,11 @@ export default defineConfig({
       },
     ],
   },
-  plugins: lazyPlugins(() => [react(), tailwindcss() as any]),
+  plugins: lazyPlugins(() => [react(), tailwindcss()]),
   resolve: {
     tsconfigPaths: true,
+  },
+  test: {
+    setupFiles: ['./src/testing/setup.ts'],
   },
 });

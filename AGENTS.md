@@ -25,3 +25,24 @@ release. Add a tool name to select part of the graph. For example, run
 - [ ] If setup, runtime, or package-manager behavior looks wrong, run `vp env doctor` and include its output when asking for help.
 
 <!--VITE PLUS END-->
+
+## Persistent Project State
+
+Before making architectural changes, read:
+
+- `docs/architecture/progress.md`
+- `docs/architecture/roadmap.md`
+- `docs/architecture/decisions.md`
+
+### Resume Rules
+
+1. Inspect the repository before trusting the checkpoint.
+2. Only one task may be `IN_PROGRESS`.
+3. Do not repeat tasks marked `DONE` unless verification shows they are incomplete.
+4. Work on the current task before starting another task.
+5. Run the relevant verification after changes.
+6. Update `progress.md` before ending the session.
+7. Record architectural changes in `decisions.md`.
+8. Update `roadmap.md` only when the long-term plan changes.
+9. The repository and git history are the source of truth.
+10. Keep tasks small enough to implement, verify, and commit independently.
