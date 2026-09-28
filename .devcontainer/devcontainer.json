@@ -1,6 +1,6 @@
 {
   "name": "Bulletproof React",
-  "image": "ghcr.io/voidzero-dev/vite-plus:1.0.0-rc.1",
+  "image": "ghcr.io/voidzero-dev/vite-plus:1.0.0",
   "features": {
     "ghcr.io/postfinance/devcontainer-features/playwright-deps:2": {}
   },

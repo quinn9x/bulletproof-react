@@ -495,7 +495,7 @@ Do not assume client-side authorization is sufficient for a real backend.
 
 ### REL-01 — Error Handling
 
-**Status:** `TODO`
+**Status:** `IN_PROGRESS`
 
 Review:
 

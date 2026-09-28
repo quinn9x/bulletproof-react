@@ -129,7 +129,7 @@ The project must remain easy to resume across AI sessions without depending on p
 - The actual login flow redirects to `/app`.
 - The authenticated user can subsequently access `/app/discussions`.
 - Playwright initially failed because Chromium could not load `libglib-2.0.so.0`.
-- The Dev Container was based on `ghcr.io/voidzero-dev/vite-plus:1.0.0-rc.1`.
+- The Dev Container was based on `ghcr.io/voidzero-dev/vite-plus:1.0.0`.
 - The browser/runtime dependency issue was resolved through the Dev Container Playwright configuration.
 - After the browser environment was corrected, the Chromium smoke test passed.
 
@@ -451,7 +451,7 @@ These warnings are currently non-blocking.
 
 Current base image:
 
-- `ghcr.io/voidzero-dev/vite-plus:1.0.0-rc.1`
+- `ghcr.io/voidzero-dev/vite-plus:1.0.0`
 
 The project uses Vite+ as the primary development/test/build tool.
 
