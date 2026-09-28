@@ -25,6 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/toast';
+import { getApiErrorMessage } from '@/lib/api-error';
 import { Authorization } from '@/lib/authorization';
 import { ROLES } from '@/lib/roles';
 import { useDiscussion } from '../api/get-discussion';
@@ -61,10 +62,13 @@ export const UpdateDiscussion = ({ discussionId }: UpdateDiscussionProps) => {
           description: 'Discussion updated successfully.',
         });
       },
-      onError: () => {
+      onError: (error) => {
         toast.add({
           type: 'error',
-          description: 'Failed to update discussion. Please try again.',
+          description: getApiErrorMessage(
+            error,
+            'Failed to update discussion. Please try again.',
+          ),
         });
       },
     },

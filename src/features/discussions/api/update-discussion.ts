@@ -6,6 +6,7 @@ import { type MutationConfig } from '@/lib/react-query';
 import { type Discussion } from '@/types/api';
 
 import { getDiscussionQueryOptions } from './get-discussion';
+import { discussionsQueryKeys } from './get-discussions';
 
 export const updateDiscussionInputSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -37,9 +38,14 @@ export const useUpdateDiscussion = ({
 
   return useMutation({
     onSuccess: async (data, ...args) => {
-      void queryClient.refetchQueries({
+      await queryClient.invalidateQueries({
         queryKey: getDiscussionQueryOptions(data.id).queryKey,
       });
+
+      await queryClient.invalidateQueries({
+        queryKey: discussionsQueryKeys.all,
+      });
+
       onSuccess?.(data, ...args);
     },
     ...restConfig,

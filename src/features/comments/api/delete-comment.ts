@@ -23,10 +23,11 @@ export const useDeleteComment = ({
   const { onSuccess, ...restConfig } = mutationConfig || {};
 
   return useMutation({
-    onSuccess: (...args) => {
-      void queryClient.invalidateQueries({
+    onSuccess: async (...args) => {
+      await queryClient.invalidateQueries({
         queryKey: getInfiniteCommentsQueryOptions(discussionId).queryKey,
       });
+
       onSuccess?.(...args);
     },
     ...restConfig,

@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { toast } from '@/components/ui/toast';
+import { getApiErrorMessage } from '@/lib/api-error';
 import { useUser } from '@/lib/auth';
 import { useDeleteUser } from '../api/delete-user';
 
@@ -28,6 +29,16 @@ export const DeleteUser = ({ id }: DeleteUserProps) => {
         toast.add({
           type: 'success',
           description: 'User Deleted',
+        });
+      },
+
+      onError: (error) => {
+        toast.add({
+          type: 'error',
+          description: getApiErrorMessage(
+            error,
+            'Failed to delete user. Please try again.',
+          ),
         });
       },
     },

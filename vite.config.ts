@@ -65,6 +65,7 @@ export default defineConfig({
         'warn',
         {
           allowConstantExport: true,
+          allowExportNames: ['clientLoader'],
         },
       ],
       'react/react-in-jsx-scope': 'off',

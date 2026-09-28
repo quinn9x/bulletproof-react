@@ -17,11 +17,16 @@ export const getDiscussions = (
   });
 };
 
+export const discussionsQueryKeys = {
+  all: ['discussions'] as const,
+  list: (page = 1) => ['discussions', { page }] as const,
+};
+
 export const getDiscussionsQueryOptions = ({
-  page,
+  page = 1,
 }: { page?: number } = {}) => {
   return queryOptions({
-    queryKey: page ? ['discussions', { page }] : ['discussions'],
+    queryKey: discussionsQueryKeys.list(page),
     queryFn: () => getDiscussions(page),
   });
 };

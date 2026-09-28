@@ -24,6 +24,7 @@ import {
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/components/ui/toast';
+import { getApiErrorMessage } from '@/lib/api-error';
 import {
   createCommentInputSchema,
   useCreateComment,
@@ -57,6 +58,16 @@ export const CreateComment = ({ discussionId }: CreateCommentProps) => {
           description: 'Comment created successfully.',
         });
       },
+
+      onError: (error) => {
+        toast.add({
+          type: 'error',
+          description: getApiErrorMessage(
+            error,
+            'Failed to create comment. Please try again.',
+          ),
+        });
+      },
     },
   });
   const isPending = createCommentMutation.isPending;
@@ -83,11 +94,7 @@ export const CreateComment = ({ discussionId }: CreateCommentProps) => {
       />
 
       <DrawerContent>
-        <form
-          onSubmit={form.handleSubmit(onSubmit, (errors) =>
-            console.log('FORM ERRORS:', errors),
-          )}
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)}>
           <DrawerHeader>
             <DrawerTitle>Create Comment</DrawerTitle>
             <DrawerDescription>

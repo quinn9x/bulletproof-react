@@ -8,7 +8,7 @@
 - Repository: `quinn9x/bulletproof-react`
 - Baseline commit: `fd8e1788e83d1e55cb410a1b3cbc30aa9e760e4d`
 - Current phase: Phase 1 — Quality Foundation
-- Current task: `ARC-05`
+- Current task: `REL-01`
 - Status: `IN_PROGRESS`
 
 ## Current Objective
@@ -348,44 +348,55 @@ The API boundary was reviewed through:
 
 ### Current State
 
-- [ ] Reviewed session handling.
-- [ ] Reviewed authentication state management.
-- [ ] Reviewed protected routes.
-- [ ] Reviewed role handling.
-- [ ] Reviewed authorization checks.
-- [ ] Reviewed token/cookie behavior.
-- [ ] Reviewed logout behavior.
-- [ ] Reviewed authentication persistence behavior.
+- [x] Reviewed authentication state management through `react-query-auth`.
+- [x] Confirmed authentication state is initialized through `AuthLoader` and `/auth/me`.
+- [x] Reviewed protected route handling through `ProtectedRoute`.
+- [x] Confirmed unauthenticated users are redirected to the login route.
+- [x] Reviewed role definitions and authorization checks.
+- [x] Confirmed role-based UI authorization is centralized through `Authorization` and `useAuthorization`.
+- [x] Reviewed resource-level authorization policy for comment deletion.
+- [x] Confirmed authentication uses cookie-based credentials with Axios `withCredentials`.
+- [x] Confirmed no application code stores authentication tokens in `localStorage` or `sessionStorage`.
+- [x] Confirmed `401` responses are handled centrally by the API client.
+- [x] Reviewed logout behavior through `/auth/logout`.
+- [x] Reviewed authentication integration coverage for login, current-user lookup, invalid credentials, and logout.
+- [x] No authentication or authorization refactor was required.
 
-### Review Scope
+### Review Result
 
-The review should verify:
+The current authentication and authorization implementation is consistent with the intended client-side architecture.
 
-- How authentication state is established and restored.
-- How unauthenticated users are redirected.
-- How protected routes enforce authentication.
-- How roles are represented and consumed.
-- How authorization checks are applied in the UI and route boundaries.
-- How authentication cookies/tokens are transmitted.
-- How logout clears authentication state.
-- Whether persistence is client-side, server-side, or cookie-based.
-- Whether client-side authorization is incorrectly treated as a security boundary.
+- Authentication state is managed centrally through `react-query-auth`.
+- `AuthLoader` resolves the current authenticated user before rendering the application.
+- `ProtectedRoute` prevents unauthenticated users from accessing protected application routes.
+- Authentication credentials are handled through cookies rather than application-managed browser storage.
+- Axios is configured with `withCredentials: true`, allowing the browser to send authentication cookies with API requests.
+- Unauthorized API responses (`401`) are handled centrally by redirecting the user to the login route.
+- Logout is implemented through the backend `/auth/logout` endpoint.
+- Roles are explicitly typed as `ADMIN` and `USER`.
+- Role-based UI access is centralized through `Authorization` and `useAuthorization`.
+- Resource-level authorization for comment deletion checks both the user's role and resource ownership.
 
-Do not assume client-side authorization is sufficient for a real backend.
+A security boundary observation remains: client-side route protection and authorization checks must not be treated as enforcement of backend authorization. The backend must independently validate authentication, roles, resource ownership, and permissions for protected operations.
 
-### Initial Findings
+Cookie security attributes such as `HttpOnly`, `Secure`, `SameSite`, expiration, and server-side session/token invalidation cannot be established from the frontend implementation alone. The repository's mock authentication implementation documents `Secure` and `HttpOnly` as requirements for a real API, but these attributes should be verified against the actual backend before production deployment.
 
-The repository inspection already confirms:
+ARC-05 is complete based on repository inspection.
 
-- `src/lib/api-client.ts` enables `withCredentials: true` for cookie-based requests.
-- The API client centrally redirects `401` responses to the login route.
-- `src/lib/auth.tsx` owns login, registration, logout, and current-user retrieval.
-- `src/lib/use-authorization.ts` and `src/lib/authorization.tsx` provide client-side role checks.
-- Protected application routes use `ProtectedRoute`.
-- Feature components use `Authorization` with role constraints such as `ROLES.ADMIN`.
-- Integration tests cover authenticated and unauthenticated API behavior.
+### Verification
 
-The remaining ARC-05 work is to verify the complete authentication lifecycle and determine whether any persistence, authorization, logout, or security-boundary issues require changes.
+The authentication and authorization review covered:
+
+- `src/lib/auth.tsx`
+- `src/lib/protected-route.tsx`
+- `src/lib/authorization.tsx`
+- `src/lib/use-authorization.ts`
+- `src/lib/roles.ts`
+- `src/lib/api-client.ts`
+- `src/app/provider.tsx`
+- Authentication integration tests
+- Discussion authorization integration tests
+- Mock authentication and cookie handling
 
 ## Verification Status
 
@@ -510,12 +521,14 @@ None.
 - The application currently uses MSW and an in-memory database for integration testing; browser-level runtime behavior still needs verification against the intended runtime configuration.
 - The current production build reports a large chunk warning and a browser-externalized `node:fs/promises` dependency that should be investigated separately from FND-05.
 - The exact Dev Container Playwright dependency strategy should remain documented so future sessions do not reintroduce the missing-browser-library problem.
+- Backend enforcement of authentication, authorization, resource ownership, and session invalidation must be verified separately from the client architecture review.
+- Production cookie security attributes (`HttpOnly`, `Secure`, `SameSite`, expiration) cannot be verified from the frontend repository alone.
 
 ## Next Tasks
 
-1. `ARC-05` — Authentication and Authorization Review
-2. `REL-01` — Error Handling
-3. `REL-02` — Loading and Empty States
+1. `REL-01` — Error Handling
+2. `REL-02` — Loading and Empty States
+3. `REL-03` — Data Consistency
 
 ## Repository Verification
 
@@ -566,7 +579,7 @@ Never blindly trust a stale checkpoint.
 ## Last Updated
 
 - Date: `2026-09-28`
-- Last verified commit: `fd8e1788e83d1e55cb410a1b3cbc30aa9e760e4d`
+- Last verified commit: `c9e8b2dbbf1c0dbad44e3b14fe4ca67e8551c894`
 - Updated by: AI-assisted development
 
 ## AI Maintenance Rules

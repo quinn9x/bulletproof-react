@@ -476,7 +476,7 @@ grep -RInE \\
 
 ### ARC-05 — Authentication and Authorization Review
 
-**Status:** `TODO`
+**Status:** `DONE`
 
 Perform a dedicated security-oriented review of:
 
@@ -732,5 +732,5 @@ The repository is the source of truth when this roadmap becomes stale.
   - `vp check`: 0 errors, 6 warnings.
   - `vp test`: 4 Vitest files, 19 tests, plus 1 passing Playwright smoke test.
   - `vp build`: succeeds.
-- Current task: `ARC-05`
+- Current task: `REL-01`
 - Status: `IN_PROGRESS`

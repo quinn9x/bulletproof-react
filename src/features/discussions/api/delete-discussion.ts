@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api-client';
 import { type MutationConfig } from '@/lib/react-query';
 
-import { getDiscussionsQueryOptions } from './get-discussions';
+import { discussionsQueryKeys } from './get-discussions';
 
 export const deleteDiscussion = ({
   discussionId,
@@ -25,10 +25,11 @@ export const useDeleteDiscussion = ({
   const { onSuccess, ...restConfig } = mutationConfig || {};
 
   return useMutation({
-    onSuccess: (...args) => {
-      void queryClient.invalidateQueries({
-        queryKey: getDiscussionsQueryOptions().queryKey,
+    onSuccess: async (...args) => {
+      await queryClient.invalidateQueries({
+        queryKey: discussionsQueryKeys.all,
       });
+
       onSuccess?.(...args);
     },
     ...restConfig,

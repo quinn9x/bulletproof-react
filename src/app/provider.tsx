@@ -1,6 +1,10 @@
 import { Suspense, useState, type ReactNode } from 'react';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  MutationCache,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -19,6 +23,11 @@ export const AppProvider = ({ children }: AppProviderProps) => {
     () =>
       new QueryClient({
         defaultOptions: queryConfig,
+        mutationCache: new MutationCache({
+          onError: (error) => {
+            console.error('Mutation error:', error);
+          },
+        }),
       }),
   );
 
