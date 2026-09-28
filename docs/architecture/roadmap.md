@@ -256,65 +256,223 @@
 
 ### ARC-01 — Application Boundary Review
 
-**Status:** `TODO`
+**Status:** `DONE`
 
-Review boundaries between:
+**Goal:** Verify that application, feature, shared component, and core utility layers maintain a consistent dependency direction.
 
-- `app`
-- `components`
-- `features`
-- `lib`
-- `config`
-- `types`
-- `utils`
-- `testing`
+#### Result
 
-Focus on dependency direction and prevent accidental cross-feature coupling.
+- Reviewed imports from feature API modules.
+- Feature API modules do not import from `src/app` or `src/components`.
+- Reviewed shared/core layers under `src/lib`, `src/config`, `src/types`, and `src/components`.
+- Shared/core layers do not import from `src/app` or `src/features`.
+- Application routes compose feature APIs and feature components.
+- No reverse dependency violating the current architectural boundary was found.
+- No refactor was required for this task.
 
-### ARC-02 — Feature Module Consistency
+#### Verification
 
-**Status:** `TODO`
+Dependency searches were performed against:
 
-Review feature modules for consistent organization of:
+- `src/features/*/api`
+- `src/lib`
+- `src/config`
+- `src/types`
+- `src/components`
 
-- API functions.
-- Components.
-- Query options.
-- Schemas.
-- Types.
-- Mutations.
-- Authorization rules.
+The reviewed dependency direction is:
 
-Do not introduce abstractions unless multiple features genuinely require them.
+```text
+src/app
+    ↓
+src/features
+    ↓
+shared/core layers
+
+src/components
+src/lib
+src/config
+src/types
+    ↗
+used by application/features without depending back on them
+```
+
+## ARC-02 — Feature Module Consistency
+
+**Status:** `DONE`
+
+### Current State
+
+- [x] Reviewed all current feature modules under `src/features`.
+- [x] Confirmed consistent separation between `api/` and `components/`.
+- [x] Reviewed API functions, query options, mutations, schemas, and feature-local types.
+- [x] Confirmed React Query patterns are consistent across applicable features.
+- [x] Confirmed schemas are colocated with the mutations/forms that use them.
+- [x] Confirmed authorization rules remain centralized in `src/lib/authorization.tsx`, `src/lib/use-authorization.ts`, and `src/lib/roles.ts`.
+- [x] Confirmed no unnecessary shared abstractions are required.
+- [x] Confirmed no feature-to-feature dependency was found in the reviewed imports.
+- [x] Confirmed authentication remains a deliberate application-wide concern through `src/lib/auth.tsx`.
+- [x] No code refactor was required.
+
+### Review Result
+
+The feature modules currently follow a consistent organization:
+
+- `api/` owns API functions, React Query options/hooks, mutations, and feature-specific validation schemas.
+- `components/` owns feature UI and consumes the feature API layer.
+- Shared authorization remains outside individual features.
+- Shared infrastructure remains in `src/lib`, `src/components`, `src/config`, and `src/types`.
+- No new abstraction is justified by the current level of duplication.
+
+A minor consistency observation remains: `src/features/discussions/components/discussions-list.tsx` uses a relative import for a feature-local API module while most other feature components use alias imports. This does not create a dependency-direction violation and does not require architectural refactoring.
+
+ARC-02 is complete based on repository inspection.
+
+### Verification
+
+The following checks were performed:
+
+```bash
+for feature in src/features/*; do
+  echo "=== $(basename "$feature") ==="
+  find "$feature" -maxdepth 2 -type f | sort
+done
+
+grep -RInE \
+  "QueryOptions|InputSchema|Schema|MutationConfig|QueryConfig|useMutation|useQuery|useInfiniteQuery|Authorization|ROLES" \
+  src/features \
+  2>/dev/null
+
+grep -RInE "from ['\"](@/)?features/|from ['\"]\.\.?/.*/features/" \
+  src/features \
+  2>/dev/null
+
+grep -RInE "Authorization|allowedRoles|ROLES|useAuthorization" \
+  src/app src/features src/components src/lib \
+  2>/dev/null
+```
 
 ### ARC-03 — Routing and Data Loading
 
-**Status:** `TODO`
+**Status:** `DONE`
 
-Review:
+### Current State
 
-- React Router configuration.
-- Route-level loaders.
-- React Query integration.
-- Query invalidation.
-- Error boundaries.
-- Loading states.
-- Protected routes.
+- [x] Reviewed React Router configuration and route composition.
+- [x] Confirmed application routes use `createBrowserRouter` with lazy-loaded route modules.
+- [x] Confirmed route `clientLoader` functions receive the shared `QueryClient`.
+- [x] Confirmed route loaders use feature-owned React Query options for data loading.
+- [x] Confirmed discussion routes preload discussion and comments data through the query client.
+- [x] Confirmed discussion list prefetches comments data before navigation.
+- [x] Confirmed mutations invalidate or refetch affected queries.
+- [x] Confirmed protected application routes are wrapped by `ProtectedRoute`.
+- [x] Confirmed role-based authorization remains enforced at the route/component boundary.
+- [x] Confirmed application-level and route-level error boundaries are present.
+- [x] Confirmed loading states are provided at provider, route, and feature levels.
+- [x] No routing or data-loading refactor was required.
 
-Pay particular attention to the relationship between `clientLoader` and React Fast Refresh warnings.
+### Review Result
+
+The current routing and data-loading implementation is consistent with the intended architecture:
+
+- `src/app/router.tsx` owns application route composition and lazy route loading.
+- Route modules expose `clientLoader` functions for route-level data requirements.
+- React Query remains the data-loading and caching mechanism shared by route loaders and feature components.
+- Feature API modules own query definitions while application routes compose those queries.
+- Protected routes are enforced at the application route boundary.
+- Error and loading states are handled at multiple appropriate boundaries.
+- Query invalidation and prefetching are handled through the shared React Query client.
+
+The router adapter currently uses an `any` type for the dynamically imported route module. This is a type-safety observation rather than a routing/data-loading architectural violation and does not require refactoring for ARC-03.
+
+ARC-03 is complete based on repository inspection.
+
+### Verification
+
+The following checks were performed:
+
+```bash
+find src/app/routes -type f \( -name '*.ts' -o -name '*.tsx' \) -print | sort
+
+grep -RInE \
+  "createBrowserRouter|createRouter|RouterProvider|RouteObject|loader|clientLoader|action|HydrateFallback|defer|QueryClient|queryOptions|useQuery|useInfiniteQuery|queryClient|invalidateQueries|prefetchQuery" \
+  src/app src/lib src/features \
+  2>/dev/null
+
+grep -RInE \
+  "ProtectedRoute|RequireAuth|useUser|Navigate|redirect|AuthLoader" \
+  src/app src/lib \
+  2>/dev/null
+
+grep -RInE \
+  "ErrorBoundary|errorElement|Suspense|fallback|Loading|Spinner|isLoading|isPending|isFetching" \
+  src/app src/components src/features \
+  2>/dev/null
+```
+
+### Fast Refresh Observation
+
+The relationship between route-level `clientLoader` exports and React Fast Refresh was reviewed.
+
+The route modules intentionally export `clientLoader` alongside the default route component because the router adapter consumes this convention through `convert(queryClient)`. No architectural change was required as part of ARC-03.
 
 ### ARC-04 — API and External Data Boundaries
 
-**Status:** `TODO`
+**Status:** `DONE`
 
-Review:
+### Current State
 
-- Axios configuration.
-- API response typing.
-- Runtime validation.
-- Error normalization.
-- Authentication handling.
-- Mock API parity.
+- [x] Reviewed the centralized Axios configuration in `src/lib/api-client.ts`.
+- [x] Confirmed feature API modules use `apiClient` rather than calling Axios directly.
+- [x] Confirmed API response types are declared at the API boundary through typed `apiClient` calls.
+- [x] Reviewed runtime validation with Zod for request/input schemas and environment configuration.
+- [x] Reviewed API error handling and confirmed Axios errors propagate through the existing React Query/API layers.
+- [x] Confirmed `401` responses are handled centrally by the API client and redirect to the login route.
+- [x] Confirmed cookie-based authentication is configured centrally through `withCredentials`.
+- [x] Reviewed integration coverage for authentication and discussion API error cases.
+- [x] No API boundary refactor was required.
+
+### Review Result
+
+The current API and external data boundary is consistent with the intended architecture:
+
+- `src/lib/api-client.ts` owns the shared Axios instance and HTTP methods.
+- Feature API modules own endpoint-specific operations and consume the shared API client.
+- Request/input validation is colocated with the feature API or form that owns the operation.
+- API response types are supplied at the call site through TypeScript generics.
+- Authentication-related HTTP behavior remains centralized in the API client.
+- Integration tests provide coverage for important authentication and API failure cases.
+
+A type-safety observation remains: the API client generic describes the expected response shape at compile time but does not perform runtime response validation. This does not currently require architectural refactoring for ARC-04.
+
+ARC-04 is complete based on repository inspection.
+
+### Verification
+
+The following checks were performed:
+
+```bash
+sed -n '1,220p' src/lib/api-client.ts
+
+grep -RInE \\
+  "axios|Axios|apiClient|ApiResponse|Response|zod|z\\\\.object|safeParse|parse|schema" \\
+  src/lib src/features src/types src/config \\
+  2>/dev/null
+
+find src/features -type f \\
+  \\( -path '*/api/*' -o -path '*/types.ts' \\) \\
+  -print | sort
+
+grep -RInE \\
+  "AxiosError|isAxiosError|catch|throw new|Error\\\\(|response\\\\.data|status" \\
+  src/lib src/features \\
+  2>/dev/null
+
+grep -RInE \\
+  "Authorization|Bearer|cookie|credentials|401|403|logout|redirectToLogin" \\
+  src/lib src/features \\
+  2>/dev/null
+```
 
 ### ARC-05 — Authentication and Authorization Review
 
@@ -574,5 +732,5 @@ The repository is the source of truth when this roadmap becomes stale.
   - `vp check`: 0 errors, 6 warnings.
   - `vp test`: 4 Vitest files, 19 tests, plus 1 passing Playwright smoke test.
   - `vp build`: succeeds.
-- Current task: `FND-05`
+- Current task: `ARC-05`
 - Status: `IN_PROGRESS`

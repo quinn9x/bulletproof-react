@@ -6,9 +6,9 @@
 ## Project
 
 - Repository: `quinn9x/bulletproof-react`
-- Baseline commit: `f083e74ff4c8290587e4808cd07d2fef701e519f`
+- Baseline commit: `fd8e1788e83d1e55cb410a1b3cbc30aa9e760e4d`
 - Current phase: Phase 1 — Quality Foundation
-- Current task: `FND-05`
+- Current task: `ARC-05`
 - Status: `IN_PROGRESS`
 
 ## Current Objective
@@ -148,6 +148,245 @@ The smoke test validates:
 
 The test uses the application's existing MSW/mock authentication environment.
 
+## ARC-01 — Application Boundary Review
+
+### Current State
+
+- [x] Reviewed dependencies from `src/features/*/api`.
+- [x] Confirmed feature API modules do not import from `src/app` or `src/components`.
+- [x] Reviewed dependencies from `src/lib`, `src/config`, `src/types`, and `src/components`.
+- [x] Confirmed shared/application-independent layers do not import from `src/app` or `src/features`.
+- [x] Confirmed application routes compose feature APIs and feature components.
+- [x] No dependency direction violations were found in the reviewed boundaries.
+- [x] No code refactor was required.
+
+### Review Result
+
+The current dependency direction is consistent with the intended application architecture:
+
+- `src/app` composes application routes and features.
+- `src/features` owns feature-specific API and component code.
+- `src/components` provides shared UI/common components.
+- `src/lib`, `src/config`, and `src/types` remain independent of application routes and feature modules.
+- No reverse dependency from shared/core layers into `src/app` or `src/features` was detected.
+
+ARC-01 is complete based on repository inspection.
+
+### Verification
+
+The following dependency checks were performed:
+
+```bash
+grep -RInE "from ['\"](@/)?app/|from ['\"]\.\.?/.*/app/" \
+  src/features \
+  2>/dev/null
+
+grep -RInE "from ['\"](@/)?components/|from ['\"]\.\.?/.*/components/" \
+  src/features \
+  2>/dev/null
+
+grep -RInE "from ['\"](@/)?(app|features)/|from ['\"]\.\.?/.*/(app|features)/" \
+  src/lib src/config src/types src/components \
+  2>/dev/null
+```
+
+## ARC-02 — Feature Module Consistency
+
+### Current State
+
+- [x] Reviewed organization of all feature modules under `src/features`.
+- [x] Reviewed feature API, component, hook, and type organization.
+- [x] Confirmed feature APIs own endpoint-specific query and mutation definitions.
+- [x] Confirmed feature components consume feature APIs rather than duplicating HTTP access.
+- [x] Reviewed cross-feature imports.
+- [x] Reviewed authorization usage across feature components.
+- [x] Confirmed no broad shared feature abstraction is required by multiple features.
+- [x] No feature-module architectural refactor was required.
+
+### Review Result
+
+The feature modules currently follow a consistent organization:
+
+- Feature-specific API operations remain under each feature's `api` directory.
+- Feature UI remains under feature `components` directories.
+- Feature-specific schemas are colocated with the operations/forms that own them.
+- Shared HTTP behavior remains in `src/lib/api-client.ts`.
+- Shared authorization behavior remains in `src/lib`.
+- Cross-feature dependencies were reviewed and no architectural coupling requiring refactoring was identified.
+
+A minor consistency observation remains: `src/features/discussions/components/discussions-list.tsx` uses a relative import for a feature-local API module while most other feature components use alias imports. This does not create a dependency-direction violation and does not require architectural refactoring.
+
+ARC-02 is complete based on repository inspection.
+
+### Verification
+
+The following checks were performed:
+
+```bash
+for feature in src/features/*; do
+  echo "=== $(basename "$feature") ==="
+  find "$feature" -maxdepth 2 -type f | sort
+done
+
+grep -RInE \
+  "QueryOptions|InputSchema|Schema|MutationConfig|QueryConfig|useMutation|useQuery|useInfiniteQuery|Authorization|ROLES" \
+  src/features \
+  2>/dev/null
+
+grep -RInE "from ['\"](@/)?features/|from ['\"]\.\.?/.*/features/" \
+  src/features \
+  2>/dev/null
+
+grep -RInE "Authorization|allowedRoles|ROLES|useAuthorization" \
+  src/app src/features src/components src/lib \
+  2>/dev/null
+```
+
+## ARC-03 — Routing and Data Loading
+
+### Current State
+
+- [x] Reviewed React Router configuration and route composition.
+- [x] Confirmed application routes use `createBrowserRouter` with lazy-loaded route modules.
+- [x] Confirmed route `clientLoader` functions receive the shared `QueryClient`.
+- [x] Confirmed route loaders use feature-owned React Query options for data loading.
+- [x] Confirmed discussion routes preload discussion and comments data through the query client.
+- [x] Confirmed discussion list prefetches comments data before navigation.
+- [x] Confirmed mutations invalidate or refetch affected queries.
+- [x] Confirmed protected application routes are wrapped by `ProtectedRoute`.
+- [x] Confirmed role-based authorization remains enforced at the route/component boundary.
+- [x] Confirmed application-level and route-level error boundaries are present.
+- [x] Confirmed loading states are provided at provider, route, and feature levels.
+- [x] No routing or data-loading refactor was required.
+
+### Review Result
+
+The current routing and data-loading implementation is consistent with the intended architecture:
+
+- `src/app/router.tsx` owns application route composition and lazy route loading.
+- Route modules expose `clientLoader` functions for route-level data requirements.
+- React Query remains the data-loading and caching mechanism shared by route loaders and feature components.
+- Feature API modules own query definitions while application routes compose those queries.
+- Protected routes are enforced at the application route boundary.
+- Error and loading states are handled at multiple appropriate boundaries.
+- Query invalidation and prefetching are handled through the shared React Query client.
+
+The router adapter currently uses an `any` type for the dynamically imported route module. This is a type-safety observation rather than a routing/data-loading architectural violation and does not require refactoring for ARC-03.
+
+ARC-03 is complete based on repository inspection.
+
+### Verification
+
+The following checks were performed:
+
+```bash
+find src/app/routes -type f \( -name '*.ts' -o -name '*.tsx' \) -print | sort
+
+grep -RInE \
+  "createBrowserRouter|createRouter|RouterProvider|RouteObject|loader|clientLoader|action|HydrateFallback|defer|QueryClient|queryOptions|useQuery|useInfiniteQuery|queryClient|invalidateQueries|prefetchQuery" \
+  src/app src/lib src/features \
+  2>/dev/null
+
+grep -RInE \
+  "ProtectedRoute|RequireAuth|useUser|Navigate|redirect|AuthLoader" \
+  src/app src/lib \
+  2>/dev/null
+
+grep -RInE \
+  "ErrorBoundary|errorElement|Suspense|fallback|Loading|Spinner|isLoading|isPending|isFetching" \
+  src/app src/components src/features \
+  2>/dev/null
+```
+
+### Fast Refresh Observation
+
+The relationship between route-level `clientLoader` exports and React Fast Refresh was reviewed.
+
+The route modules intentionally export `clientLoader` alongside the default route component because the router adapter consumes this convention through `convert(queryClient)`. No architectural change was required as part of ARC-03.
+
+## ARC-04 — API and External Data Boundaries
+
+### Current State
+
+- [x] Reviewed the centralized Axios configuration in `src/lib/api-client.ts`.
+- [x] Confirmed feature API modules use `apiClient` rather than calling Axios directly.
+- [x] Confirmed API response types are declared at the API boundary through typed `apiClient` calls.
+- [x] Reviewed runtime validation with Zod for request/input schemas and environment configuration.
+- [x] Reviewed API error handling and confirmed Axios errors propagate through the existing React Query/API layers.
+- [x] Confirmed `401` responses are handled centrally by the API client and redirect to the login route.
+- [x] Confirmed cookie-based authentication is configured centrally through `withCredentials`.
+- [x] Reviewed integration coverage for authentication and discussion API error cases.
+- [x] No API boundary refactor was required.
+
+### Review Result
+
+The current API and external data boundary is consistent with the intended architecture.
+
+- `src/lib/api-client.ts` owns the shared Axios instance and HTTP methods.
+- Feature API modules own endpoint-specific operations and consume the shared API client.
+- Request/input validation is colocated with the feature API or form that owns the operation.
+- API response types are supplied at the call site through TypeScript generics.
+- Authentication-related HTTP behavior remains centralized in the API client.
+- Integration tests cover important authentication and API failure cases.
+
+A type-safety observation remains: the API client generic describes the expected response shape at compile time but does not perform runtime response validation. This does not currently require architectural refactoring for ARC-04.
+
+ARC-04 is complete based on repository inspection.
+
+### Verification
+
+The API boundary was reviewed through:
+
+- `src/lib/api-client.ts`
+- Feature API modules under `src/features/*/api`
+- `src/types/api.ts`
+- Authentication integration tests
+- Discussion API integration tests
+- Zod schemas and environment validation
+
+## ARC-05 — Authentication and Authorization Review
+
+### Current State
+
+- [ ] Reviewed session handling.
+- [ ] Reviewed authentication state management.
+- [ ] Reviewed protected routes.
+- [ ] Reviewed role handling.
+- [ ] Reviewed authorization checks.
+- [ ] Reviewed token/cookie behavior.
+- [ ] Reviewed logout behavior.
+- [ ] Reviewed authentication persistence behavior.
+
+### Review Scope
+
+The review should verify:
+
+- How authentication state is established and restored.
+- How unauthenticated users are redirected.
+- How protected routes enforce authentication.
+- How roles are represented and consumed.
+- How authorization checks are applied in the UI and route boundaries.
+- How authentication cookies/tokens are transmitted.
+- How logout clears authentication state.
+- Whether persistence is client-side, server-side, or cookie-based.
+- Whether client-side authorization is incorrectly treated as a security boundary.
+
+Do not assume client-side authorization is sufficient for a real backend.
+
+### Initial Findings
+
+The repository inspection already confirms:
+
+- `src/lib/api-client.ts` enables `withCredentials: true` for cookie-based requests.
+- The API client centrally redirects `401` responses to the login route.
+- `src/lib/auth.tsx` owns login, registration, logout, and current-user retrieval.
+- `src/lib/use-authorization.ts` and `src/lib/authorization.tsx` provide client-side role checks.
+- Protected application routes use `ProtectedRoute`.
+- Feature components use `Authorization` with role constraints such as `ROLES.ADMIN`.
+- Integration tests cover authenticated and unauthenticated API behavior.
+
+The remaining ARC-05 work is to verify the complete authentication lifecycle and determine whether any persistence, authorization, logout, or security-boundary issues require changes.
+
 ## Verification Status
 
 Latest verified commands:
@@ -274,10 +513,9 @@ None.
 
 ## Next Tasks
 
-1. Finish `FND-05` — E2E Smoke Test
-2. `ARC-01` — Application Boundary Review
-3. `ARC-02` — Feature Module Consistency
-4. `ARC-03` — API and Data Contract Review
+1. `ARC-05` — Authentication and Authorization Review
+2. `REL-01` — Error Handling
+3. `REL-02` — Loading and Empty States
 
 ## Repository Verification
 
@@ -328,7 +566,7 @@ Never blindly trust a stale checkpoint.
 ## Last Updated
 
 - Date: `2026-09-28`
-- Last verified commit: `b904dab137f093fd3b35b5978c272ede45f281cc`
+- Last verified commit: `fd8e1788e83d1e55cb410a1b3cbc30aa9e760e4d`
 - Updated by: AI-assisted development
 
 ## AI Maintenance Rules
