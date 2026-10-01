@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vp dev",
     "build": "tsc -b && vp build",
-    "lint": "vp lint",
+    "lint": "vpr lint",
     "preview": "vp preview"
   },
   "dependencies": {
@@ -52,7 +52,7 @@
   "devEngines": {
     "packageManager": {
       "name": "pnpm",
-      "version": "12.5.1",
+      "version": "12.8.1",
       "onFail": "download"
     }
   },

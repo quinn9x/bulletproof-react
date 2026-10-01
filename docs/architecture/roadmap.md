@@ -72,7 +72,7 @@
 #### Current State
 
 - CI workflow is defined in `.github/workflows/ci.yml`.
-- CI uses pnpm `12.5.1`.
+- CI uses pnpm `12.8.1`.
 - CI installs dependencies with `pnpm install --frozen-lockfile`.
 - CI runs `pnpm exec vp check`.
 - CI runs `pnpm exec vp test`.

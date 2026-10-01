@@ -539,7 +539,7 @@ There is no separate `vitest.config.ts` or `vite-plus.config.ts`.
 CI environment:
 
 - Node.js `24`
-- pnpm `12.5.1`
+- pnpm `12.8.1`
 - `VITE_APP_API_URL=http://localhost:8080`
 
 The repository therefore already has a CI quality workflow; this is not an outstanding missing item.
